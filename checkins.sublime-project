@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "path": ".",
+            "folder_exclude_patterns": [
+                "build",
+                ".cache",
+                "dbschema/edgeql-js"
+            ]
+        }
+    ],
+    "settings": {
+        "lsp_format_on_save": true,
+        "LSP": {
+            "LSP-typescript": {
+                "enabled": true,
+            }
+        },
+    },
+}
