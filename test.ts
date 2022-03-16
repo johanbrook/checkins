@@ -1,4 +1,4 @@
-#!/usr/bin/env node -r esbuild-register
+#!/usr/bin/env node -r esbuild-register --no-warnings
 
 import fs from 'fs/promises';
 import { basename } from 'path';
