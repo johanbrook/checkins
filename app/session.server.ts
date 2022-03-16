@@ -64,4 +64,9 @@ export const mkAuth = (model: Model): Auth => {
 };
 
 export const maskEmail = (email: string) =>
-    email[0] + '*'.repeat(email.slice(1, email.indexOf('@')).length) + email.slice(email.indexOf('@'));
+    email[0] + // first
+    '*'.repeat(email.slice(1, email.indexOf('@')).length) + // *****
+    '@' +
+    email.at(email.indexOf('@') + 1) + // first after @
+    '*'.repeat(email.slice(email.indexOf('@') + 1, email.lastIndexOf('.') - 1).length) +
+    email.slice(email.lastIndexOf('.'));
