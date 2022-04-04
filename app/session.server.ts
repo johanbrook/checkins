@@ -1,5 +1,5 @@
 import { createCookieSessionStorage, Session } from "remix";
-import { Authenticator } from "remix-auth";
+import { Authenticator, AuthorizationError } from "remix-auth";
 import { EmailLinkStrategy, SendEmailOptions } from "remix-auth-email-link";
 import { getConfig } from "./config.server";
 import type { Model } from "./data.server";
@@ -37,14 +37,17 @@ export const mkAuth = (model: Model): Auth => {
         new EmailLinkStrategy(
             { sendEmail, secret: getConfig('MAGIC_LINK_SECRET'), callbackURL: '/magic', validateSessionMagicLink: true },
             async ({ email }: { email: string }) => {
-                const user = await model.findUserByEmail(email);
+                try {
+                    const user = await model.createUserIfNotExists(email);
 
-                if (!user) {
-                    console.log(`Couldn't find user with email "${maskEmail(email)}", creating new one`);
-                    return model.createUserIfNotExists(email);
-                };
+                    return { id: user.id };
+                } catch (ex) {
+                    console.error(`Error when verifying email: ${email}`, ex);
+                }
 
-                return { id: user.id };
+                // This will have no effect in the email strategy we're using, due to this:
+                // https://github.com/pbteja1998/remix-auth-email-link/blob/main/src/index.ts#L288
+                throw new AuthorizationError('An error occurred when trying to verify the email');
             }
         )
     );
