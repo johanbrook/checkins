@@ -2,7 +2,7 @@ import { LoaderFunction } from "custom.env";
 import { Frequency } from "~/types.server";
 
 export const loader: LoaderFunction<string> = async ({ params, request, context }) => {
-    const groups = await context.model.findGroupsForFeed(params.id!);
+    const groups = await context.model.findGroupsForFeed(params.slug!);
     const query = new URL(request.url).searchParams;
 
     const ics = renderIcs(groups.flatMap(g =>

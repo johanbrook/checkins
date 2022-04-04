@@ -1,8 +1,9 @@
-import e, { type $infer } from '~/edgeql-js'; // auto-generated
-import type { EdgeDb } from '~/db.server';
-import { decrypt, encrypt, hash } from "~/crypto.server";
-import { Frequency } from "~/types.server";
+import e, { type $infer } from '../dbschema/edgeql-js'; // auto-generated
+import type { EdgeDb } from './db.server';
+import { decrypt, encrypt, hash } from "./crypto.server";
+import { Frequency } from "./types.server";
 import { getConfig } from './config.server';
+import { generateRandomSlug } from './words.server';
 
 // QUERIES
 
@@ -29,7 +30,7 @@ const findGroupsQuery = e.params({ userId: e.uuid }, (params) =>
     })
 );
 
-const findGroupsForFeedQuery = e.params({ userId: e.uuid }, (params) =>
+const findGroupsForFeedQuery = e.params({ userSlug: e.str }, (params) =>
     e.select(e.Grp, (g) => ({
         id: true,
         freq: true,
@@ -41,7 +42,7 @@ const findGroupsForFeedQuery = e.params({ userId: e.uuid }, (params) =>
             name: true,
             createdAt: true,
         },
-        filter: e.op(g.user.id, '=', params.userId),
+        filter: e.op(g.user.slug, '=', params.userSlug),
     })),
 );
 
@@ -120,8 +121,9 @@ const moveFriendQuery = e.params({ friendId: e.uuid, groupId: e.uuid }, (params)
     }))
 );
 
-const createUserQuery = e.params({ email: e.str, email_bidx: e.str }, (params) =>
+const createUserQuery = e.params({ slug: e.str, email: e.str, email_bidx: e.str }, (params) =>
     e.insert(e.User, {
+        slug: params.slug,
         email: params.email,
         email_bidx: params.email_bidx,
     })
@@ -130,6 +132,7 @@ const createUserQuery = e.params({ email: e.str, email_bidx: e.str }, (params) =
 export interface User {
     id: string;
     email: string;
+    slug: string;
 }
 
 // ACTUAL FUNCTIONS TO RUN QUERIES (PUBLIC API)
@@ -140,8 +143,8 @@ export const createModel = (db: EdgeDb) => ({
     findGroups: (userId: string): Promise<FindGroups> =>
         findGroupsQuery.run(db, { userId }),
 
-    findGroupsForFeed: (userId: string) =>
-        findGroupsForFeedQuery.run(db, { userId }),
+    findGroupsForFeed: (userSlug: string) =>
+        findGroupsForFeedQuery.run(db, { userSlug }),
 
     createFriend: async (name: string, groupId: string, userId: string) =>
         createFriendQuery.run(db, { name, groupId, userId }),
@@ -170,6 +173,7 @@ export const createModel = (db: EdgeDb) => ({
             e.select(e.User, (u) => ({
                 id: true,
                 email: true,
+                slug: true,
                 filter: e.op(u.id, '=', params.id),
             }))
         ).run(db, { id });
@@ -189,6 +193,7 @@ export const createModel = (db: EdgeDb) => ({
         if (user) return { id: user.id };
 
         return createUserQuery.run(db, {
+            slug: generateRandomSlug(),
             email: encrypt(email, getConfig('EMAIL_PASSPHRASE')),
             email_bidx: hash(email, getConfig('EMAIL_HASH_KEY')),
         });
@@ -203,6 +208,7 @@ const findUserByEmail = (db: EdgeDb, email: string): Promise<User | null> => {
         e.select(e.User, (u) => ({
             id: true,
             email: true,
+            slug: true,
             filter: e.op(u.email_bidx, '=', params.email),
         }))
     ).run(db, { email: hashedEmail });

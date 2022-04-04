@@ -44,7 +44,7 @@ export default function Index() {
 
             <p>Hi {user.email}!</p>
 
-            <Link to={`/users/${user.id}/feed.ics`} reloadDocument>Generate .ics</Link>
+            <Link to={`/users/${user.slug}/feed.ics`} reloadDocument>Generate .ics</Link>
 
             {groups.map(g => (
                 <section key={g.id}>

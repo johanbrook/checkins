@@ -38,6 +38,15 @@ module default {
     }
 
     type User {
+
+        # Publically seen in calendar links. Can be rotated.
+        required property slug -> str {
+            constraint exclusive;
+            constraint expression on (
+                __subject__ = str_trim(__subject__)
+            );
+        }
+
         required property email -> str {
             constraint exclusive;
         }
