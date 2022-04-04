@@ -10,7 +10,6 @@
         }
     ],
     "settings": {
-        "lsp_format_on_save": true,
         "LSP": {
             "LSP-typescript": {
                 "enabled": true,
