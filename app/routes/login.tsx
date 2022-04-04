@@ -1,20 +1,23 @@
 import { ActionFunction, LoaderFunction } from 'custom.env';
 import { json, useLoaderData } from 'remix';
-type LoaderData = { magicLinkSent: boolean, error?: string };
+type LoaderData = { magicLinkSent: boolean; error?: string };
 
 export const loader: LoaderFunction<LoaderData> = async ({ request, context }) => {
     await context.auth.isAuthenticated(request, { successRedirect: '/' });
     const session = await context.auth.getUserSession(request);
 
-    return json<LoaderData>({
-        magicLinkSent: session.has('auth:magiclink'),
-        error: session.get('auth:error')?.message,
-    }, {
-        headers: {
-            "Set-Cookie": await context.auth.commitSession(session),
+    return json<LoaderData>(
+        {
+            magicLinkSent: session.has('auth:magiclink'),
+            error: session.get('auth:error')?.message,
         },
-    });
-}
+        {
+            headers: {
+                'Set-Cookie': await context.auth.commitSession(session),
+            },
+        },
+    );
+};
 
 export const action: ActionFunction = async ({ request, context }) => {
     await context.auth.authenticate('email-link', request, {
@@ -23,7 +26,7 @@ export const action: ActionFunction = async ({ request, context }) => {
         // rendered.
         failureRedirect: '/login',
     });
-}
+};
 
 export default function Login() {
     const { magicLinkSent, error } = useLoaderData<LoaderData>();

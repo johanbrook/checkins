@@ -1,7 +1,7 @@
-import createClient, { Client } from "edgedb";
-import { getConfig } from "./config.server";
+import createClient, { Client } from 'edgedb';
+import { getConfig } from './config.server';
 
-export type { Client as EdgeDb } from "edgedb";
+export type { Client as EdgeDb } from 'edgedb';
 
 declare global {
     var __db: Client | undefined;
@@ -25,4 +25,4 @@ export const createEdgeDb = (): Client => {
     }
 
     return db;
-}
+};

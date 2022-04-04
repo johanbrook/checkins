@@ -1,8 +1,8 @@
-import { createCookieSessionStorage, Session } from "remix";
-import { Authenticator, AuthorizationError } from "remix-auth";
-import { EmailLinkStrategy, SendEmailOptions } from "remix-auth-email-link";
-import { getConfig } from "./config.server";
-import type { Model } from "./data.server";
+import { createCookieSessionStorage, Session } from 'remix';
+import { Authenticator, AuthorizationError } from 'remix-auth';
+import { EmailLinkStrategy, SendEmailOptions } from 'remix-auth-email-link';
+import { getConfig } from './config.server';
+import type { Model } from './data.server';
 
 interface SessionUser {
     id: string;
@@ -11,19 +11,22 @@ interface SessionUser {
 const sendEmail = async (opts: SendEmailOptions<SessionUser>) => {
     console.log('Sending email: ' + opts.emailAddress);
     console.log(opts.magicLink);
-}
+};
 
-export type Auth = Pick<Authenticator<SessionUser>, 'isAuthenticated' | 'authenticate' | 'logout'> & {
+export type Auth = Pick<
+    Authenticator<SessionUser>,
+    'isAuthenticated' | 'authenticate' | 'logout'
+> & {
     getUserSession: (req: Request) => Promise<Session>;
-    commitSession: (session: Session) => Promise<string>,
+    commitSession: (session: Session) => Promise<string>;
 };
 
 export const mkAuth = (model: Model): Auth => {
     const storage = createCookieSessionStorage({
         cookie: {
-            name: "checkins_session",
-            sameSite: "lax",
-            path: "/",
+            name: 'checkins_session',
+            sameSite: 'lax',
+            path: '/',
             httpOnly: true,
             secrets: [getConfig('SESSION_SECRET')],
             maxAge: 60 * 60 * 24 * 30,
@@ -35,7 +38,12 @@ export const mkAuth = (model: Model): Auth => {
 
     auth.use(
         new EmailLinkStrategy(
-            { sendEmail, secret: getConfig('MAGIC_LINK_SECRET'), callbackURL: '/magic', validateSessionMagicLink: true },
+            {
+                sendEmail,
+                secret: getConfig('MAGIC_LINK_SECRET'),
+                callbackURL: '/magic',
+                validateSessionMagicLink: true,
+            },
             async ({ email }: { email: string }) => {
                 try {
                     const user = await model.createUserIfNotExists(email);
@@ -48,8 +56,8 @@ export const mkAuth = (model: Model): Auth => {
                 // This will have no effect in the email strategy we're using, due to this:
                 // https://github.com/pbteja1998/remix-auth-email-link/blob/main/src/index.ts#L288
                 throw new AuthorizationError('An error occurred when trying to verify the email');
-            }
-        )
+            },
+        ),
     );
 
     return {
@@ -59,8 +67,7 @@ export const mkAuth = (model: Model): Auth => {
 
         logout: auth.logout.bind(auth),
 
-        getUserSession: (req: Request) =>
-            storage.getSession(req.headers.get('Cookie')),
+        getUserSession: (req: Request) => storage.getSession(req.headers.get('Cookie')),
 
         commitSession: storage.commitSession.bind(storage),
     };

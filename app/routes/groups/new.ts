@@ -1,6 +1,6 @@
-import { ActionFunction } from "custom.env";
-import { redirect } from "remix";
-import { Frequency } from "~/types.server";
+import { ActionFunction } from 'custom.env';
+import { redirect } from 'remix';
+import { Frequency } from '~/types.server';
 
 export const action: ActionFunction = async ({ request: req, context }) => {
     const { id: userId } = await context.auth.isAuthenticated(req, { failureRedirect: '/login' });
@@ -10,13 +10,13 @@ export const action: ActionFunction = async ({ request: req, context }) => {
 
     if (!freq) {
         throw new Response('Did not get "freq".', {
-            status: 400
+            status: 400,
         });
     }
 
     if (!assertFreq(freq)) {
         throw new Response(`The value of "freq" (${freq}) doesn't seem right.`, {
-            status: 400
+            status: 400,
         });
     }
 
@@ -34,5 +34,4 @@ export const action: ActionFunction = async ({ request: req, context }) => {
 
 const FREQS: Array<Frequency> = ['Daily', 'Weekly', 'Monthly', 'HalfYearly', 'Yearly'];
 
-const assertFreq = (t: string): t is Frequency =>
-    FREQS.includes(t as Frequency);
+const assertFreq = (t: string): t is Frequency => FREQS.includes(t as Frequency);

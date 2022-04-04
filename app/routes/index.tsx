@@ -1,8 +1,8 @@
-import { LoaderFunction } from "custom.env";
-import { Form, Link, useLoaderData, useTransition } from "remix";
-import { type Context } from "server";
-import { FindGroups, User } from "~/data.server";
-import { MoveFriendForm } from "./friends/move";
+import { LoaderFunction } from 'custom.env';
+import { Form, Link, useLoaderData, useTransition } from 'remix';
+import { type Context } from 'server';
+import { FindGroups, User } from '~/data.server';
+import { MoveFriendForm } from './friends/move';
 
 type LoaderData = FindGroups & { user: User };
 
@@ -13,7 +13,7 @@ export const loader: LoaderFunction<LoaderData, Context> = async ({ request, con
 
     if (!user) {
         throw new Response('Cannot find current user in database', {
-            status: 404
+            status: 404,
         });
     }
 
@@ -27,9 +27,10 @@ export default function Index() {
     const { groups, friendsWithoutGroup, user } = useLoaderData<LoaderData>();
     const transition = useTransition();
 
-    const existingFreqs = groups.map(g => g.freq);
-    const frequencies = (['Daily', 'Weekly', 'Monthly', 'HalfYearly', 'Yearly'] as const)
-        .filter(s => !existingFreqs.includes(s));
+    const existingFreqs = groups.map((g) => g.freq);
+    const frequencies = (['Daily', 'Weekly', 'Monthly', 'HalfYearly', 'Yearly'] as const).filter(
+        (s) => !existingFreqs.includes(s),
+    );
 
     return (
         <main>
@@ -44,9 +45,11 @@ export default function Index() {
 
             <p>Hi {user.email}!</p>
 
-            <Link to={`/users/${user.slug}/feed.ics`} reloadDocument>Generate .ics</Link>
+            <Link to={`/users/${user.slug}/feed.ics`} reloadDocument>
+                Generate .ics
+            </Link>
 
-            {groups.map(g => (
+            {groups.map((g) => (
                 <section key={g.id}>
                     <header className="flex items-center justify-between">
                         <h2 className="no-margin">{g.freq}</h2>
@@ -56,15 +59,18 @@ export default function Index() {
                         </Form>
                     </header>
                     <ul>
-                        {g.friends.map(c => (
+                        {g.friends.map((c) => (
                             <li key={c.id}>
                                 <span>{c.name}</span>
                                 <Form method="post" action="/friends/delete">
                                     <input type="hidden" name="friendId" value={c.id} />
                                     <input type="submit" value="Delete" />
                                 </Form>
-                                {groups.filter(gr => gr.id != g.id).length > 0 && (
-                                    <MoveFriendForm friend={c} groups={groups.filter(gr => gr.id != g.id)} />
+                                {groups.filter((gr) => gr.id != g.id).length > 0 && (
+                                    <MoveFriendForm
+                                        friend={c}
+                                        groups={groups.filter((gr) => gr.id != g.id)}
+                                    />
                                 )}
                             </li>
                         ))}
@@ -76,7 +82,7 @@ export default function Index() {
                 <h3>Friends without group</h3>
 
                 <ul>
-                    {friendsWithoutGroup.map(c => (
+                    {friendsWithoutGroup.map((c) => (
                         <li key={c.id}>
                             <span>{c.name}</span>
                             <Form method="post" action="/friends/delete">
@@ -93,29 +99,36 @@ export default function Index() {
                 <h3>New friend</h3>
                 <input type="text" name="name" placeholder="Name…" required />
                 <select name="groupId" required>
-                    {groups.map(g => (
-                        <option value={g.id} key={g.id}>{g.freq}</option>
+                    {groups.map((g) => (
+                        <option value={g.id} key={g.id}>
+                            {g.freq}
+                        </option>
                     ))}
                 </select>
                 <input
                     type="submit"
                     value={transition.state == 'submitting' ? 'Creating…' : 'Create'}
-                    disabled={transition.state == 'submitting'} />
+                    disabled={transition.state == 'submitting'}
+                />
             </Form>
 
-            {frequencies.length > 0 && <Form method="post" action="/groups/new">
-                <h3>New group</h3>
-                <select name="freq" required>
-                    {frequencies.map(r => (
-                        <option value={r} key={r}>{r}</option>
-                    ))}
-                </select>
-                <input
-                    type="submit"
-                    value={transition.state == 'submitting' ? 'Creating…' : 'Create'}
-                    disabled={transition.state == 'submitting'} />
-            </Form>}
-        </main >
+            {frequencies.length > 0 && (
+                <Form method="post" action="/groups/new">
+                    <h3>New group</h3>
+                    <select name="freq" required>
+                        {frequencies.map((r) => (
+                            <option value={r} key={r}>
+                                {r}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        type="submit"
+                        value={transition.state == 'submitting' ? 'Creating…' : 'Create'}
+                        disabled={transition.state == 'submitting'}
+                    />
+                </Form>
+            )}
+        </main>
     );
 }
-

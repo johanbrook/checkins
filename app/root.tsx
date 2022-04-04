@@ -1,27 +1,20 @@
-import {
-    Links,
-    LinksFunction,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration
-} from "remix";
-import type { MetaFunction } from "remix";
+import { Links, LinksFunction, Meta, Outlet, Scripts, ScrollRestoration } from 'remix';
+import type { MetaFunction } from 'remix';
 
-import styles from "~/app.css";
+import styles from '~/app.css';
 
 export const meta: MetaFunction = () => {
-    return { title: "Checkins app" };
+    return { title: 'Checkins app' };
 };
 
 export const links: LinksFunction = () => {
     return [
         {
-            rel: "stylesheet",
+            rel: 'stylesheet',
             href: styles,
-        }
-    ]
-}
+        },
+    ];
+};
 
 export default function App() {
     return (

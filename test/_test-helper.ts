@@ -19,30 +19,32 @@ export const tests: Array<TestCase> = [];
      assert.equals(true, true);
  * });
  * ```
- */ 
+ */
 export const test = (name: string, test: Test) => {
     tests.push({ name, test, path: getCallerFile() });
-}
+};
 
 const getCallerFile = (): string | undefined => {
     let originalFunc = Error.prepareStackTrace;
-    let callerfile: string | undefined;;
+    let callerfile: string | undefined;
 
     try {
         const err = new Error();
         let currentfile: string | undefined;
-        
+
         Error.prepareStackTrace = (_, stack) => stack;
-        
-        currentfile = (err.stack as unknown as NodeJS.CallSite[]).shift()?.getFileName() ?? undefined;
+
+        currentfile =
+            (err.stack as unknown as NodeJS.CallSite[]).shift()?.getFileName() ?? undefined;
 
         while ((err.stack as unknown as NodeJS.CallSite[]).length) {
-            callerfile = (err.stack as unknown as NodeJS.CallSite[]).shift()?.getFileName() ?? undefined;
+            callerfile =
+                (err.stack as unknown as NodeJS.CallSite[]).shift()?.getFileName() ?? undefined;
             if (currentfile !== callerfile) break;
         }
     } catch (e) {}
 
-    Error.prepareStackTrace = originalFunc; 
+    Error.prepareStackTrace = originalFunc;
 
     return callerfile;
 };

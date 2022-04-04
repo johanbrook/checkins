@@ -1,6 +1,10 @@
 // (1/235) * (1/1100) * (1/110) = 1/28435000 chance of collision
 export const generateRandomSlug = (): string =>
-    randomFromArray(superlatives) + '-' + randomFromArray(adjectives) + '-' + randomFromArray(animals);
+    randomFromArray(superlatives) +
+    '-' +
+    randomFromArray(adjectives) +
+    '-' +
+    randomFromArray(animals);
 
 const randomFromArray = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 

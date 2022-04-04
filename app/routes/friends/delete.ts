@@ -1,5 +1,5 @@
-import { ActionFunction } from "custom.env";
-import { redirect } from "remix";
+import { ActionFunction } from 'custom.env';
+import { redirect } from 'remix';
 
 export const action: ActionFunction = async ({ request: req, context }) => {
     const { id: userId } = await context.auth.isAuthenticated(req, { failureRedirect: '/login' });
@@ -9,7 +9,7 @@ export const action: ActionFunction = async ({ request: req, context }) => {
 
     if (!friendId) {
         throw new Response('Did not get "friendId".', {
-            status: 400
+            status: 400,
         });
     }
 

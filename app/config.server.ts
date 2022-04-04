@@ -9,4 +9,4 @@ export const getConfig = (key: string, def?: string): string => {
     }
 
     return val;
-}
+};

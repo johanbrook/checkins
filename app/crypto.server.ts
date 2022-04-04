@@ -1,4 +1,4 @@
-import CryptoJS from "crypto-js";
+import CryptoJS from 'crypto-js';
 
 // Crypto functions (no bitcoin mining)
 
@@ -39,31 +39,29 @@ export const decrypt = (str: string, passphrase: string) => {
 
     // a word array is an array of numbers of 4 bytes. always divide each
     // slice by 4 = the length of each word.
-    const salt = CryptoJS.lib.WordArray.create(
-        wordArray.words.slice(0, SALT_LEN / 4)
-    );
+    const salt = CryptoJS.lib.WordArray.create(wordArray.words.slice(0, SALT_LEN / 4));
     const iv = CryptoJS.lib.WordArray.create(
-        wordArray.words.slice(0 + SALT_LEN / 4, (SALT_LEN + IV_LEN) / 4)
+        wordArray.words.slice(0 + SALT_LEN / 4, (SALT_LEN + IV_LEN) / 4),
     );
 
-    const key = CryptoJS.PBKDF2(
-        passphrase,
-        salt,
-        {
-            keySize: KEY_SIZE,
-            iterations: ITERATIONS,
-            hasher: HASHER,
-        }
-    );
+    const key = CryptoJS.PBKDF2(passphrase, salt, {
+        keySize: KEY_SIZE,
+        iterations: ITERATIONS,
+        hasher: HASHER,
+    });
 
-    const dec = CryptoJS.AES.decrypt(CryptoJS.lib.CipherParams.create({
-        ciphertext: CryptoJS.lib.WordArray.create(
-            wordArray.words.slice((SALT_LEN + IV_LEN) / 4)
-        ),
-    }), key, { iv });
+    const dec = CryptoJS.AES.decrypt(
+        CryptoJS.lib.CipherParams.create({
+            ciphertext: CryptoJS.lib.WordArray.create(
+                wordArray.words.slice((SALT_LEN + IV_LEN) / 4),
+            ),
+        }),
+        key,
+        { iv },
+    );
 
     return dec.toString(CryptoJS.enc.Utf8);
-}
+};
 
 /**
  * Hash a string with HMAC, returns the result encoded as base64.
